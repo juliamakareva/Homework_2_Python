@@ -1,6 +1,7 @@
 import unittest
 from item import Item
 
+# this test checks the methods of the Class Item
 
 class TestItem(unittest.TestCase):
     def test_item_id(self):

@@ -50,12 +50,11 @@ class Item:
             if tag in self._tags:
                 self._tags.remove(tag)
 
-    def is_tagged(self, tags):
-        "this f checks if all tags from the list are assigned to the item"
-        for tag in tags:
-            if tag not in self._tags:
-                return False
-        return True
+    def is_tagged(self, tags: str | list[str]) -> bool:
+        "проверял наличие одного тега если ему передана строка, или наличие ВСЕХ тегов если передан контейнер строк."
+        if isinstance(tags, str):  # checking if tags is a string
+            return tags in self._tags # checking if this string in the list;
+        return all(tag in self._tags for tag in tags) # if tags is not a str, so it is a list & we check each element
 
     def __len__(self):
         return len(self._tags)  # this f returns the number of tags

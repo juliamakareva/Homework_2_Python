@@ -2,7 +2,7 @@ from item import Item
 from hub import Hub
 import unittest
 
-
+# this test checks the methods of the Class Hub
 class TestHub(unittest.TestCase):
     def test_hub_singleton(self):
         """Проверка того что hub - синглтон"""  # небольшая документация к тесту
