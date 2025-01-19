@@ -100,7 +100,7 @@ class Hub:
 
     @property
     def date(self):
-        """Get the current date of the hub as a string if the date is set."""
+        """Return the date as a datetime object."""
         return self._date
 
     @date.setter
@@ -133,7 +133,6 @@ class Hub:
             for item in self._items:
                 if start_date <= item.dispatch_time <= end_date:
                     result.append(item)
-
 
         return result
 

@@ -1,6 +1,8 @@
 from item import Item
 from hub import Hub
 import unittest
+from datetime import datetime
+
 
 
 # this test checks the methods of the Class Hub
@@ -124,6 +126,64 @@ class TestHub(unittest.TestCase):
         found_items = h1.find_by_date("01/01/2025", "02/01/2025")
         self.assertIn(item1, found_items)
         self.assertIn(item2, found_items)
+
+    def test_rm_item_by_id(self):
+        """Test for rm_item by id."""
+        h1 = Hub()
+        h1.clear_items()
+        Item.reset_id()
+        item1 = Item("item1", "description1")
+        item2 = Item("item2", "description2")
+
+        h1.add_item(item1)
+        h1.add_item(item2)
+        h1.rm_item(1)
+        self.assertNotIn(item1, h1._items)
+
+    def test_rm_item_by_object(self):
+        """Test for rm_item by item."""
+        h1 = Hub()
+        h1.clear_items()
+        item1 = Item("item1", "description1")
+        item2 = Item("item2", "description2")
+
+        h1.add_item(item1)
+        h1.add_item(item2)
+        h1.rm_item(item2)
+        self.assertNotIn(item2, h1._items)
+
+    def test_drop_items(self):
+        """Тест удаления нескольких элементов."""
+        h1 = Hub()
+        h1.clear_items()
+        item1 = Item("item1", "description1")
+        item2 = Item("item2", "description2")
+
+        h1.add_item(item1)
+        h1.add_item(item2)
+        h1.drop_items([item1, item2])
+        self.assertNotIn(item1, h1._items)
+        self.assertNotIn(item2, h1._items)
+
+    def test_date_setter(self):
+        # Test if we set a str --> datetime object.
+        hub = Hub()
+        hub.date = "10/01/2025"
+        self.assertEqual(hub.date, datetime(2025, 1, 10))
+        # Test if we set a datetime object
+        new_date = datetime(2025, 1, 15)
+        hub.date = new_date
+        self.assertEqual(hub.date, new_date)
+
+        # Test RaiseValueError
+
+        with self.assertRaises(ValueError) as context:
+            hub.date = 123  # Integer
+        self.assertEqual(str(context.exception), "Date must be a string or a datetime object")
+
+        with self.assertRaises(ValueError) as context:
+            hub.date = [2025, 1, 15]  # List
+        self.assertEqual(str(context.exception), "Date must be a string or a datetime object")
 
     def test_find_most_valuable(self):
         """Проверка нахождения самых дорогих предметов"""
