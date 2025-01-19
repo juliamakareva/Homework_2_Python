@@ -1,10 +1,11 @@
 import unittest
 from item import Item
+import random
 
 
 # this test checks the methods of the Class Item
-
 class TestItem(unittest.TestCase):
+
     def test_item_id(self):
         'Проверка того что у разных Items разные id'
         tomato = Item("tomato", "from the garden", "05/01/2025")

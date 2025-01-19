@@ -2,6 +2,7 @@ from typing import Any
 import copy
 from datetime import datetime, timedelta
 
+
 class Item:
     _id = 0  # counter for unique ID's
 
@@ -9,7 +10,7 @@ class Item:
     def reset_id(cls):
         cls._id = 0  # Сбросить ID на 0
 
-    def __init__(self, name, description, quantity=0, dispatch_time=None, _tags=None, cost:float = None):
+    def __init__(self, name, description, quantity=0, dispatch_time=None, _tags=None, cost: float = None):
         if cost is not None and cost < 0:  # add cost checking
             raise ValueError("The cost cannot be negative")
         Item._id += 1
@@ -40,7 +41,7 @@ class Item:
         """Shows useful info"""
         # modifying datetime object to a str for a better comprehension
         dispatch_time_str = self.dispatch_time.strftime('%d/%m/%Y')
-        return f"{self.name} - {self.description} (Date: {dispatch_time_str}, Tags: {len(self._tags)})"
+        return f"{self.name} - {self.description} (Date: {dispatch_time_str}, Tags: {len(self._tags)}, Cost: {self.cost})"
 
     def add_tag(self, tag: str):
         if tag not in self._tags:
