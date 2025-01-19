@@ -30,7 +30,7 @@ class TestItem(unittest.TestCase):
         self.assertEqual(len(item1), 1)
 
     def test_cost_get(self):
-        item = Item("Test11", "Descriptiiiion", _cost=150.00)
+        item = Item("Test11", "Descriptiiiion", cost=150.00)
 
         self.assertEqual(item.cost, 150.00)
 
@@ -39,6 +39,16 @@ class TestItem(unittest.TestCase):
         item5.cost = 200.0
 
         self.assertEqual(item5.cost, 200.0)
+
+        # checking the negative value & Raise Error
+        with self.assertRaises(ValueError) as context:
+            item10 = Item("Test Item", "Test Description", cost=-10)
+        self.assertEqual(str(context.exception), "The cost cannot be negative")
+
+        # checking the cost setter
+        with self.assertRaises(ValueError) as context:
+            item5.cost = -100
+        self.assertEqual(str(context.exception), "The cost cannot be negative")
 
     def test_copy_item(self):
         item4 = Item("Test0001", "Descrip")
@@ -74,11 +84,20 @@ class TestItem(unittest.TestCase):
         self.assertTrue(item.is_tagged(["tag1", "tag2", "tag3"]))
 
     def test_lt(self):
-        item7 = Item("Test0003", "Descriptn", _cost=150.00)
-        item = Item("Test item", "Test description", _cost=750.00)
+        item7 = Item("Test0003", "Descriptn", cost=150.00)
+        item = Item("Test item", "Test description", cost=750.00)
+        item3 = Item("Test3", "Description3")
 
         self.assertTrue(item7 < item)
         self.assertFalse(item < item7)
+
+        with self.assertRaises(ValueError) as context:
+            item < item3
+        self.assertEqual(str(context.exception), "Cannot compare items with no cost")
+
+        with self.assertRaises(ValueError) as context:
+            item3 < item
+        self.assertEqual(str(context.exception), "Cannot compare items with no cost")
 
 
 if __name__ == '__main__':

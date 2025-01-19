@@ -15,7 +15,12 @@ class Hub:
     def __init__(self, _items=None, _date=None, hub=None):
         if not hasattr(self, '_items'):  # Initialize only once
             self._items = [] if _items is None else _items
-            self._date = _date
+            if isinstance(_date, str):
+                self._date = datetime.strptime(_date, '%d/%m/%Y')
+            elif isinstance(_date, datetime):
+                self._date = _date
+            else:
+                self._date = datetime.now()
             self.hub = hub
 
     def __str__(self):
@@ -95,14 +100,17 @@ class Hub:
 
     @property
     def date(self):
-        """Get the current date of the hub"""
-        return self._date.strftime('%d/%m/%Y') if self._date else None
+        """Get the current date of the hub as a string if the date is set."""
+        return self._date
 
     @date.setter
     def date(self, value):
         if isinstance(value, str):
-            value = datetime.strptime(value, '%d/%m/%Y')
-        self._date = value
+            self._date = datetime.strptime(value, '%d/%m/%Y')  # Преобразуем строку в datetime
+        elif isinstance(value, datetime):
+            self._date = value  # Если передан datetime, сохраняем его
+        else:
+            raise ValueError("Date must be a string or a datetime object")
 
     def find_by_date(self, *args):
         """возвращает лист всех Item, подходящих по дате"""
@@ -112,22 +120,27 @@ class Hub:
         if len(args) > 2:
             raise ValueError("Too many dates")
 
+        # Преобразуем все входные параметры в datetime объекты
         if len(args) == 1:
+            start_date = datetime.strptime(args[0], '%d/%m/%Y') if isinstance(args[0], str) else args[0]
             for item in self._items:
-                if item.dispatch_time <= args[0]:
+                if item.dispatch_time == start_date:
                     result.append(item)
 
         if len(args) == 2:
+            start_date = datetime.strptime(args[0], '%d/%m/%Y') if isinstance(args[0], str) else args[0]
+            end_date = datetime.strptime(args[1], '%d/%m/%Y') if isinstance(args[1], str) else args[1]
             for item in self._items:
-                if args[0] <= item.dispatch_time <= args[1]:
+                if start_date <= item.dispatch_time <= end_date:
                     result.append(item)
+
 
         return result
 
     def add_item(self, item):
         """ Modified add_item """
         if not isinstance(item, Item):
-            raise TypeError("he item must be an instance of the Item class or its subclass")
+            raise TypeError("The item must be an instance of the Item class or its subclass")
         if item not in self._items:
             self._items.append(item)
 

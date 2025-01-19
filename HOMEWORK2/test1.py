@@ -20,6 +20,27 @@ class TestHub(unittest.TestCase):
             h1.add_item(Item("banana", "from the garden", "05/01/2025"))  # ваш конструктор может отличаться
         self.assertEqual(len(h1), 5)
 
+    def test_add_item(self):
+        hub = Hub()
+        hub.clear_items()
+        item1 = Item("Test1", "Description1")
+        item2 = Item("Test2", "Description2")
+
+        hub.add_item(item1)
+        self.assertIn(item1, hub._items)
+
+        hub.add_item(item2)
+        self.assertEqual(len(hub._items), 2)
+
+        #checking TypeError
+        with self.assertRaises(TypeError) as context:
+            hub.add_item("not an item")
+        self.assertEqual(str(context.exception), "The item must be an instance of the Item class or its subclass")
+
+        with self.assertRaises(TypeError) as context:
+            hub.add_item(123)
+        self.assertEqual(str(context.exception), "The item must be an instance of the Item class or its subclass")
+
     def test_get_item(self):
         """test getting item with index"""
         h1 = Hub()
@@ -61,6 +82,7 @@ class TestHub(unittest.TestCase):
     def test_clear_items(self):
         """ Deleting all items from Hub"""
         h1 = Hub()
+        h1.clear_items()
         item1 = Item("item1", "description1")
         item2 = Item("item2", "description2")
 
@@ -74,6 +96,7 @@ class TestHub(unittest.TestCase):
     def test_find_by_tags(self):
         """test getting item with its tags"""
         h2 = Hub()
+        h2.clear_items()
 
         # Добавляем товары с тегами
         item1 = Item("pineapple", "Arrived by plane", _tags=["Exotic"])
@@ -88,8 +111,8 @@ class TestHub(unittest.TestCase):
     def test_find_by_date(self):
         """Проверка поиска товаров по дате"""
         h1 = Hub()
-        item1 = Item("item1", "description1",  dispatch_time="01/01/2025")
-        item2 = Item("item2", "description2",  dispatch_time="02/01/2025")
+        item1 = Item("item1", "description1", dispatch_time = "01/01/2025")
+        item2 = Item("item2", "description2", dispatch_time ="02/01/2025")
 
         h1.add_item(item1)
         h1.add_item(item2)
@@ -106,9 +129,9 @@ class TestHub(unittest.TestCase):
         """Проверка нахождения самых дорогих предметов"""
         h1 = Hub()
         h1.clear_items()
-        item1 = Item("item1", "description1", _cost =100)
-        item2 = Item("item2", "description2", _cost = 200)
-        item3 = Item("item3", "description3", _cost =300)
+        item1 = Item("item1", "description1", cost =100)
+        item2 = Item("item2", "description2", cost = 200)
+        item3 = Item("item3", "description3", cost =300)
 
         h1.add_item(item1)
         h1.add_item(item2)
@@ -116,5 +139,7 @@ class TestHub(unittest.TestCase):
 
         most_valuable = h1.find_most_valuable(2)
         self.assertEqual(most_valuable, [item3, item2])
+
+
 if __name__ == '__main__':
     unittest.main()

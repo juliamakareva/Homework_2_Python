@@ -1,6 +1,6 @@
 from typing import Any
 import copy
-
+from datetime import datetime, timedelta
 
 class Item:
     _id = 0  # counter for unique ID's
@@ -9,31 +9,38 @@ class Item:
     def reset_id(cls):
         cls._id = 0  # Сбросить ID на 0
 
-    def __init__(self, name, description, quantity=0, dispatch_time=None, _tags=None, _cost: float = None):
+    def __init__(self, name, description, quantity=0, dispatch_time=None, _tags=None, cost:float = None):
+        if cost is not None and cost < 0:  # add cost checking
+            raise ValueError("The cost cannot be negative")
         Item._id += 1
         self.id = Item._id
         self.name = name
         self.description = description
         self.quantity = quantity
-        self.dispatch_time = dispatch_time
+        if dispatch_time:
+            self.dispatch_time = datetime.strptime(dispatch_time, '%d/%m/%Y')
+        else:
+            self.dispatch_time = None
         self._tags = _tags if _tags else []
-        self._cost = _cost
+        self._cost = cost
 
     def __repr__(self):
         """Shows first 3 tags and ID"""
         if not self._tags:
-            return f"Item(id={self.id}, No tags yet)"
+            return f"Item(id={self.id},name={self.name}, No tags yet)"
 
         if len(self._tags) > 3:
             tags_to_show = self._tags[:3]
         else:
             tags_to_show = self._tags
 
-        return f"Item(id={self.id}, tags={tags_to_show})"
+        return f"Item(id={self.id},name={self.name}, tags={tags_to_show})"
 
     def __str__(self):
         """Shows useful info"""
-        return f"{self.name} - {self.description} (Date: {self.dispatch_time}, Tags: {len(self._tags)})"
+        # modifying datetime object to a str for a better comprehension
+        dispatch_time_str = self.dispatch_time.strftime('%d/%m/%Y')
+        return f"{self.name} - {self.description} (Date: {dispatch_time_str}, Tags: {len(self._tags)})"
 
     def add_tag(self, tag: str):
         if tag not in self._tags:
