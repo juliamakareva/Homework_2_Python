@@ -1,8 +1,13 @@
 from typing import Any
+import copy
 
 
 class Item:
     _id = 0  # counter for unique ID's
+
+    @classmethod
+    def reset_id(cls):
+        cls._id = 0  # Сбросить ID на 0
 
     def __init__(self, name, description, quantity=0, dispatch_time=None, _tags=None, _cost: float = None):
         Item._id += 1
@@ -11,13 +16,13 @@ class Item:
         self.description = description
         self.quantity = quantity
         self.dispatch_time = dispatch_time
-        self._tags = []
+        self._tags = _tags if _tags else []
         self._cost = _cost
 
     def __repr__(self):
         """Shows first 3 tags and ID"""
         if not self._tags:
-            return "No tags yet"
+            return f"Item(id={self.id}, No tags yet)"
 
         if len(self._tags) > 3:
             tags_to_show = self._tags[:3]
@@ -53,8 +58,8 @@ class Item:
     def is_tagged(self, tags: str | list[str]) -> bool:
         "проверял наличие одного тега если ему передана строка, или наличие ВСЕХ тегов если передан контейнер строк."
         if isinstance(tags, str):  # checking if tags is a string
-            return tags in self._tags # checking if this string in the list;
-        return all(tag in self._tags for tag in tags) # if tags is not a str, so it is a list & we check each element
+            return tags in self._tags  # checking if this string in the list;
+        return all(tag in self._tags for tag in tags)  # if tags is not a str, so it is a list & we check each element
 
     def __len__(self):
         return len(self._tags)  # this f returns the number of tags
@@ -70,4 +75,14 @@ class Item:
         self._cost = new_cost
 
     def copy_item(self):
-        return Item(self.name, self.description, self.quantity, self.dispatch_time, self._tags[:], self._cost)
+        """Creating the copy of an item with all its functionalities but different ID"""
+        copied_item = copy.deepcopy(self)
+        copied_item.id = Item._id + 1  # New ID for the copy as didn't work when tried first /Есть ли смысл использовать uuid4 как шанс коллизии мал но все таки есть?
+        Item._id += 1
+        return copied_item
+
+    def __lt__(self, other):
+        # compares 2 costs
+        if self.cost is None or other.cost is None:
+            raise ValueError("Cannot compare items with no cost")
+        return self.cost < other.cost

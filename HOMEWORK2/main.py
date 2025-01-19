@@ -1,69 +1,22 @@
 from datetime import datetime, timedelta
+import copy
+from item import Item
+from hub import Hub
 
+hub = Hub()
+hub.clear_items()
+item1 = Item("apple", "A red apple", _cost = 100, dispatch_time="10/01/2025")
+item2 = Item("banana", "Yellow banana", _cost=150, dispatch_time="15/01/2025")
+item3 = Item("avocado", "A ripe avocado", _cost=120, dispatch_time="12/01/2025")
+item4 = Item("grape", "Fresh grapes", _cost=80,dispatch_time= "13/01/2025")
+item5 = Item("watermelon", "Big watermelon", _cost=300, dispatch_time="09/01/2025")
+hub.add_item(item1)
+hub.add_item(item2)
+hub.add_item(item3)
+hub.add_item(item4)
+hub.add_item(item5)
 
-class Hub:
-    # singleton,класс обьекта нашего склада
-    _instances = {}
-
-    def __new__(cls, *args, **kwargs):
-
-        if cls not in cls._instances:
-            instance = super().__new__(cls)
-            cls._instances[cls] = instance
-            return cls._instances[cls]
-
-    def __init__(self, _items=None, _date=None, hub=None):
-        self._items = _items
-        self._date = _date
-        self.hub = hub
-
-    def add_item(self, item):
-        if item not in self._items:
-            self._items.append(item)
-
-    def __getitem__(self, index):
-        return self._items[index]
-
-    def stock_control(self):
-        """function which will control the stock of a selected item and inform when we are out of stock"""
-        for item in self._items:
-            if item.quantity == 0:
-                print(f"Warning: out of stock for {item.name} (ID: {item.id}) ")
-
-    def expiry_date_control(self):
-        """f which will control the expiry date of a selected item (if need to be removed from the stock)"""
-        current_time = datetime.now()
-        for item in self._items:
-            dispatch_time = datetime.strptime(item.dispatch_time,"%d/%m/%Y")
-            # converting from string to datetime object)
-            if current_time - dispatch_time >= timedelta(days=10):
-                print(f"Warning: this item (ID: {item.id})is close to its expiry date ")
-            else:
-                print(f"This item (ID: {item.id})is fresh")
-
-    def __len__(self):
-        """this function shows the number of items in the hub"""
-        return len(self._items)
-
-class Item:
-    _id = 0  # counter for unique ID's
-
-    def __init__(self, name, description, quantity=0, dispatch_time=None, _tags=None):
-        Item._id += 1
-        self.id = Item._id
-        self.name = name
-        self.description = description
-        self.quantity = quantity
-        self.dispatch_time = dispatch_time
-        self._tags = []
-
-    def add_tag(self, tag: str):
-        if tag not in self._tags:
-            self._tags.append(tag)
-
-    def rm_tag(self, tag: str):
-        if tag in self._tags:
-            self._tags.remove(tag)
-
-    def __len__(self):
-        return len(self._tags)  # this f returns the number of tags
+top_10 = hub.find_most_valuable(10)
+print("Топ 10 продуктов нашего Hub:")
+for pos, item in enumerate(top_10, 1):
+    print(f"Рейтинг #{pos}: {item.name} (Цена: {item._cost})")

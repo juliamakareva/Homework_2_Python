@@ -31,9 +31,9 @@ class Hub:
 
         return f"Hub contains: {', '.join(names)}"
 
-    def add_item(self, item):
-        if item not in self._items:
-            self._items.append(item)
+    #def add_item(self, item):
+    # if item not in self._items:
+    #self._items.append(item)
 
     def clear_items(self):
         """Remove all items from the hub"""
@@ -45,11 +45,11 @@ class Hub:
     def find_by_id(self, item_id):
         """ This f returns the item with its id. If nothing is found - returns(-1, None)"""
         for pos, item in enumerate(self._items):
-            if hasattr(item, "id") and item.id == item_id:
+            if item.id == item_id:
                 return pos, item
         return -1, None
 
-    def find_by_tags(self,tags):
+    def find_by_tags(self, tags):
         """ function which search for all items includin"""
         return [item for item in self._items if item.is_tagged(tags)]
 
@@ -63,7 +63,7 @@ class Hub:
         """f which will control the expiry date of a selected item (if need to be removed from the stock)"""
         current_time = datetime.now()
         for item in self._items:
-            dispatch_time = datetime.strptime(item.dispatch_time,"%d/%m/%Y")
+            dispatch_time = datetime.strptime(item.dispatch_time, "%d/%m/%Y")
             # converting from string to datetime object)
             if current_time - dispatch_time >= timedelta(days=10):
                 print(f"Warning: this item (ID: {item.id})is close to its expiry date ")
@@ -74,4 +74,64 @@ class Hub:
         """this function shows the number of items in the hub"""
         return len(self._items)
 
+    def rm_item(self, i):
+        """удаляет item с id=i если i это число, или удаляет item=i если i это Item."""
+        if isinstance(i, int):
+            for item in self._items:
+                if item.id == i:
+                    self._items.remove(item)
+                    break
+        elif isinstance(i, Item):
+            for item in self._items:
+                if item == i:
+                    self._items.remove(item)
+                    break
 
+    def drop_items(self, items):
+        """уберает товары из Hub, которые содержатся в items."""
+        for item in items:
+            if item in self._items:
+                self._items.remove(item)
+
+    @property
+    def date(self):
+        """Get the current date of the hub"""
+        return self._date.strftime('%d/%m/%Y') if self._date else None
+
+    @date.setter
+    def date(self, value):
+        if isinstance(value, str):
+            value = datetime.strptime(value, '%d/%m/%Y')
+        self._date = value
+
+    def find_by_date(self, *args):
+        """возвращает лист всех Item, подходящих по дате"""
+
+        result = []
+
+        if len(args) > 2:
+            raise ValueError("Too many dates")
+
+        if len(args) == 1:
+            for item in self._items:
+                if item.dispatch_time <= args[0]:
+                    result.append(item)
+
+        if len(args) == 2:
+            for item in self._items:
+                if args[0] <= item.dispatch_time <= args[1]:
+                    result.append(item)
+
+        return result
+
+    def add_item(self, item):
+        """ Modified add_item """
+        if not isinstance(item, Item):
+            raise TypeError("he item must be an instance of the Item class or its subclass")
+        if item not in self._items:
+            self._items.append(item)
+
+    def find_most_valuable(self, amount=1):
+        """Вернёт первые `amount` самых дорогих предметов на складе. Если предметов меньше чем `amount`, вернет все."""
+        sorted_items = sorted(self._items, key=lambda item: item.cost, reverse=True)
+        return sorted_items[:amount]

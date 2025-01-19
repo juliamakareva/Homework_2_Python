@@ -42,82 +42,79 @@ class TestHub(unittest.TestCase):
 
     def test_find_by_id(self):
         """test getting item with its ID"""
-        h1 = Hub()
-        h1.clear_items()
+        hub = Hub()
+        hub.clear_items()
+        Item.reset_id()
+        item1 = Item("item1", "description1", 100)
+        item2 = Item("item2", "description2", 200)
+        hub.add_item(item1)
+        hub.add_item(item2)
 
-        tomato = Item("tomato", "from the garden", "05/01/2025")
-        cucumber = Item("cucumber", "from the garden", "06/01/2025")
-        lettuce = Item("lettuce", "from the store", "07/01/2025")
-
-        h1.add_item(tomato)
-        h1.add_item(cucumber)
-        h1.add_item(lettuce)
-
-        pos, item = h1.find_by_id(2)
+        pos, item = hub.find_by_id(2)
         self.assertEqual(pos, 1)
-        self.assertEqual(item, cucumber)
+        self.assertEqual(item, item2)
 
-        pos, item = h1.find_by_id(4)
+        pos, item = hub.find_by_id(4)
         self.assertEqual(pos, -1)
         self.assertIsNone(item)
 
+    def test_clear_items(self):
+        """ Deleting all items from Hub"""
+        h1 = Hub()
+        item1 = Item("item1", "description1")
+        item2 = Item("item2", "description2")
 
-def test_cost_get(self):
-    item = Item("Test11", "Descriptiiiion", 150.00)
+        h1.add_item(item1)
+        h1.add_item(item2)
 
-    self.assertEqual(item.cost, 150.00)
+        self.assertEqual(len(h1), 2)
+        h1.clear_items()
+        self.assertEqual(len(h1), 0)
 
+    def test_find_by_tags(self):
+        """test getting item with its tags"""
+        h2 = Hub()
 
-def test_cost_set(self):
-    item5 = Item("Test12", "Descriptiiin")
-    item5.cost = 200.0
+        # Добавляем товары с тегами
+        item1 = Item("pineapple", "Arrived by plane", _tags=["Exotic"])
+        item2 = Item("lemon", "Description", _tags=["Not organic"])
+        h2.add_item(item1)
+        h2.add_item(item2)
 
-    self.assertEqual(item5.cost, 200.0)
+        result = h2.find_by_tags(["Exotic"])
+        self.assertIn(item1, result)
+        self.assertNotIn(item2, result)
 
+    def test_find_by_date(self):
+        """Проверка поиска товаров по дате"""
+        h1 = Hub()
+        item1 = Item("item1", "description1",  dispatch_time="01/01/2025")
+        item2 = Item("item2", "description2",  dispatch_time="02/01/2025")
 
-def test_copy_item(self):
-    item4 = Item("Test0001", "Descrip")
-    item4._tags = ["tag1", "tag2"]
-    item5 = item4.copy_item()
+        h1.add_item(item1)
+        h1.add_item(item2)
 
-    self.assertNotEqual(item4.id, item5.id)
+        found_items = h1.find_by_date("01/01/2025")
+        self.assertIn(item1, found_items)
+        self.assertNotIn(item2, found_items)
 
-    self.assertEqual(item4._tags, item5._tags)
+        found_items = h1.find_by_date("01/01/2025", "02/01/2025")
+        self.assertIn(item1, found_items)
+        self.assertIn(item2, found_items)
 
+    def test_find_most_valuable(self):
+        """Проверка нахождения самых дорогих предметов"""
+        h1 = Hub()
+        h1.clear_items()
+        item1 = Item("item1", "description1", _cost =100)
+        item2 = Item("item2", "description2", _cost = 200)
+        item3 = Item("item3", "description3", _cost =300)
 
-def test_add_tags(self):
-    item6 = Item("Test0002", "Descript")
-    item6.add_tags = ["tag4", "tag5"]
+        h1.add_item(item1)
+        h1.add_item(item2)
+        h1.add_item(item3)
 
-    self.assertIn("tag4", item6._tags)
-    self.assertIn("tag5", item6._tags)
-
-
-def test_rm_tags(self):
-    item7 = Item("Test0003", "Descriptn")
-    item7.add_tags = ["tag4", "tag5"]
-    item7.rm_tags = ["tag4", "tag5"]
-
-    self.assertNotIn("tag4", item7._tags)
-    self.assertNotIn("tag5", item7._tags)
-
-
-def test_is_tagged(self):
-    item = Item("Test item", "Test description")
-    item.add_tags(["tag1", "tag2", "tag3"])
-
-    self.assertTrue(item.is_tagged("tag1"))
-    self.assertFalse(item.is_tagged("tag1000"))
-    self.assertTrue(item.is_tagged(["tag1", "tag2", "tag3"]))
-
-
-def test_lt(self):
-    item7 = Item("Test0003", "Descriptn", 150.00)
-    item = Item("Test item", "Test description", 750.00)
-
-    self.assertTrue(item > item7)
-    self.assertFalse(item7 > item)
-
-
+        most_valuable = h1.find_most_valuable(2)
+        self.assertEqual(most_valuable, [item3, item2])
 if __name__ == '__main__':
     unittest.main()
